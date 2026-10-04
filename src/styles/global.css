@@ -1,0 +1,127 @@
+@import 'tailwindcss';
+
+/* ── Tokens ─────────────────────────────────────────────── */
+/* One dark theme (Tokyo Night) with a single UI accent. */
+@theme {
+	--color-bg: #1a1b26;
+	--color-surface: #16161e; /* cards, code blocks, sidebar */
+	--color-border: #292e42;
+	--color-faint: #8189b8; /* dates, labels, metadata (AA 5.05 on bg) */
+	--color-muted: #9aa5ce; /* secondary text */
+	--color-text: #a9b1d6; /* body */
+	--color-heading: #c0caf5; /* headings, link text */
+	--color-accent: #7aa2f7; /* the only UI accent */
+	--color-underline: #414868; /* resting link underline */
+	--color-tag: #bb9af7; /* tags, markdown marks — never a UI accent */
+	--color-warm: #e0af68; /* highlighted words and numbers */
+
+	--text-meta: 0.8125rem; /* 13px mono labels */
+	--text-meta--letter-spacing: 0.02em;
+	--text-sm: 0.875rem;
+	--text-base: 1rem;
+	--text-base--line-height: 1.7;
+	--text-h3: 1rem; /* geometric 1.5x steps: 16 / 24 / 36 */
+	--text-h2: 1.5rem;
+	--text-h1: 2.25rem;
+	--text-h1--line-height: 1.15;
+
+	--ease-out: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Font variables are defined by the fonts config in astro.config.mjs. */
+@theme inline {
+	--font-sans: var(--font-quattro), ui-sans-serif, sans-serif;
+	--font-mono: var(--font-ia-mono), ui-monospace, monospace;
+	--font-hand: var(--font-caveat), cursive; /* doodle headings only */
+}
+
+/* ── Motion ─────────────────────────────────────────────── */
+/* Tailwind has no duration namespace, so these are plain variables. */
+:root {
+	--duration-fast: 150ms;
+	--duration-base: 200ms; /* page cross-fade and morphs share one duration */
+	color-scheme: dark;
+}
+
+/* Morphing elements use the browser default (~250ms) unless told otherwise. */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+	animation-duration: var(--duration-base);
+}
+
+/* ── Base ───────────────────────────────────────────────── */
+@layer base {
+	html {
+		@apply bg-bg font-sans text-text antialiased;
+		/* Anchor jumps clear the sticky top bar on small screens; the sidebar is beside content from lg up. */
+		@apply scroll-pt-20 lg:scroll-pt-0;
+	}
+	body {
+		@apply text-base;
+	}
+	:focus-visible {
+		@apply rounded-sm outline-2 outline-offset-2 outline-accent;
+	}
+}
+
+/* ── Shared looks ───────────────────────────────────────── */
+/* Classes, not components, so Markdown and MDX can use them too. */
+
+/* Hand-lettered heading on a scribbled underline. Block, so it never shares a line with an inline neighbour. */
+@utility doodle {
+	@apply relative block w-fit -rotate-1 pb-1.25 font-hand text-h2 leading-none font-medium text-heading;
+
+	/* A heading that links to itself (shareable #section URL) hints it on hover. */
+	& > a {
+		@apply transition-colors duration-(--duration-fast) hover:text-accent;
+	}
+
+	&::after {
+		content: '';
+		@apply absolute bottom-0 left-0 h-1.5 w-full bg-accent;
+		mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 6' preserveAspectRatio='none'%3E%3Cpath d='M1 4 C 20 1, 40 5, 60 3 S 90 2, 99 4' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E")
+			0 0 / 100% 100% no-repeat;
+	}
+}
+
+/* Hand-written aside next to regular text, no underline. */
+@utility doodle-note {
+	@apply inline-block -rotate-2 font-hand leading-none text-heading;
+	/* Caveat's short lowercase reads small; a third larger matches whatever text it sits in. */
+	font-size: 1.333em;
+}
+
+@utility bullets {
+	@apply list-disc space-y-1.5 pl-4 text-muted marker:text-faint;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+	}
+}
+
+/* ── Print ──────────────────────────────────────────────── */
+/* Sidebar and footer are chrome, not content; every page prints single-column, black on white. */
+@media print {
+	:root {
+		--color-bg: white;
+		--color-surface: white;
+		--color-heading: black;
+		--color-text: black;
+		--color-muted: #333;
+		--color-faint: #555;
+		--color-accent: black;
+		--color-border: #ccc;
+	}
+	[data-chrome] {
+		display: none !important;
+	}
+	[data-frame] {
+		display: block !important;
+	}
+}

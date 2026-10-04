@@ -1,0 +1,131 @@
+---
+import Menu from '@lucide/astro/icons/menu';
+import X from '@lucide/astro/icons/x';
+import { resumePdf, nav, profile } from '../data/profile';
+import SocialLinks from './SocialLinks.astro';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));
+---
+
+<header
+	data-chrome
+	transition:name="sidebar"
+	class="sticky top-0 z-20 border-b border-border bg-surface/95 px-4 py-3 lg:flex lg:h-screen lg:w-64 lg:shrink-0 lg:flex-col lg:border-r lg:border-b-0 lg:px-5 lg:py-6"
+>
+	<div class="relative z-40 flex items-center justify-between">
+		<a href="/" class="font-mono font-bold text-heading">
+			{profile.handle}
+		</a>
+		<button
+			type="button"
+			data-menu-button
+			aria-controls="sidebar-panel"
+			aria-expanded="false"
+			aria-label="Open menu"
+			class="grid size-9 place-items-center rounded-lg border border-border text-heading lg:hidden"
+		>
+			<Menu class="size-5" data-menu-open />
+			<X class="hidden size-5" data-menu-close />
+		</button>
+	</div>
+
+	<!-- Below lg: full-screen cover, not an inline reveal, so content never shifts. -->
+	<div
+		id="sidebar-panel"
+		data-menu-panel
+		class="fixed inset-0 z-30 hidden flex-col gap-1 overflow-y-auto bg-surface px-6 pt-20 pb-8 lg:static lg:z-auto lg:mt-5 lg:flex lg:flex-1 lg:gap-0 lg:overflow-visible lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-0"
+	>
+		<p class="mt-5 text-sm text-muted">
+			I'm <span class="text-heading">{profile.firstName}</span>, {profile.tagline}
+		</p>
+
+		<nav aria-label="Main" class="mt-6 flex flex-col gap-1">
+			{nav.map((item) => {
+				const active = isActive(item.href);
+				return (
+					<a
+						href={item.href}
+						data-astro-reload={item.href === resumePdf || undefined}
+						aria-current={active ? 'page' : undefined}
+						class:list={[
+							'flex items-center gap-3 rounded-md px-2 py-1.5 transition-colors duration-(--duration-fast)',
+							active ? 'bg-bg text-heading' : 'text-text hover:bg-bg hover:text-heading',
+						]}
+					>
+						<item.icon class="size-4 text-accent" />
+						{item.label}
+					</a>
+				);
+			})}
+		</nav>
+
+		<SocialLinks class="mt-6 lg:mt-auto" iconClass="size-5" />
+	</div>
+</header>
+
+<script>
+	// ClientRouter replaces the sidebar on navigation, so bind on every page load.
+	function initMenu() {
+		const button = document.querySelector<HTMLButtonElement>('[data-menu-button]');
+		const panel = document.querySelector<HTMLElement>('[data-menu-panel]');
+		if (!button || !panel) return;
+
+		// Navigation keeps <body>, so clear any scroll lock an open menu left behind.
+		document.body.classList.remove('overflow-hidden');
+
+		// The fade/slide itself is CSS (@starting-style + allow-discrete, in the style block below).
+		const setOpen = (open: boolean) => {
+			panel.classList.toggle('hidden', !open);
+			document.body.classList.toggle('overflow-hidden', open);
+			document.querySelector('[data-content]')?.toggleAttribute('inert', open);
+			button.setAttribute('aria-expanded', String(open));
+			button.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+			button.querySelector('[data-menu-open]')?.classList.toggle('hidden', open);
+			button.querySelector('[data-menu-close]')?.classList.toggle('hidden', !open);
+		};
+
+		button.addEventListener('click', () => setOpen(button.getAttribute('aria-expanded') !== 'true'));
+		// Scoped to the sidebar, which is replaced on navigation, so listeners never pile up.
+		button.closest('header')?.addEventListener('keydown', (e) => {
+			if (e.key !== 'Escape' || button.getAttribute('aria-expanded') !== 'true') return;
+			setOpen(false);
+			button.focus();
+		});
+		// From lg (64rem) up the panel is always shown, so an open menu must not leave the page inert.
+		// Dropped when the page swaps, so listeners never pile up across navigations.
+		const listeners = new AbortController();
+		const desktop = window.matchMedia('(min-width: 64rem)');
+		desktop.addEventListener('change', (e) => e.matches && setOpen(false), { signal: listeners.signal });
+		document.addEventListener('astro:before-swap', () => listeners.abort(), { once: true });
+	}
+
+	document.addEventListener('astro:page-load', initMenu);
+</script>
+
+<style>
+	/* Animates the panel across the display:none boundary; Tailwind can't express @starting-style. */
+	#sidebar-panel {
+		transition:
+			opacity var(--duration-base) var(--ease-out),
+			transform var(--duration-base) var(--ease-out),
+			display var(--duration-base) allow-discrete;
+	}
+	#sidebar-panel.hidden {
+		opacity: 0;
+		transform: translateY(-0.5rem);
+	}
+	@starting-style {
+		#sidebar-panel:not(.hidden) {
+			opacity: 0;
+			transform: translateY(-0.5rem);
+		}
+	}
+	/* lg+: the panel is always on, in flow, never animated — must match Tailwind's `lg` breakpoint. */
+	@media (min-width: 64rem) {
+		#sidebar-panel.hidden {
+			opacity: 1;
+			transform: none;
+		}
+	}
+</style>

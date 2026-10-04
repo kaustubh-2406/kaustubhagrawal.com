@@ -22,3 +22,10 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+.vscode/
+
+wayfinder/
+
+# Local only: CV review tool with private notes, and old resume drafts
+src/pages/prototype/cv-diff/
+/Resume*.pdf

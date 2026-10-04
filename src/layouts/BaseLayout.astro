@@ -1,0 +1,61 @@
+---
+import { Font } from 'astro:assets';
+import { ClientRouter, fade } from 'astro:transitions';
+import Footer from '../components/Footer.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { profile } from '../data/profile';
+import '../styles/global.css';
+
+interface Props {
+	title?: string; // the page's own name; the site name is appended
+	description?: string;
+	wide?: boolean; // breakout width for pages with a side column
+}
+
+const {
+	title,
+	description = `${profile.name}, software developer in ${profile.location}. Portfolio, projects, and resume.`,
+	wide = false,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const columnWidth = wide ? 'max-w-4xl' : 'max-w-3xl'; // main and footer share it
+---
+
+<!doctype html>
+<html lang="en" transition:name="root" transition:animate={fade({ duration: '200ms' })}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="dark" />
+		<title>{title ? `${title} – ${profile.name}` : profile.name}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+
+		<Font cssVariable="--font-quattro" preload />
+		<Font cssVariable="--font-ia-mono" />
+		<Font cssVariable="--font-caveat" />
+
+		<!-- Disables its own animations when the visitor prefers reduced motion. -->
+		<ClientRouter />
+	</head>
+	<body>
+		<a
+			href="#main"
+			class="sr-only rounded bg-surface px-3 py-2 font-mono text-meta text-heading focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50"
+		>
+			Skip to content
+		</a>
+		<div data-frame class="flex min-h-dvh flex-col lg:flex-row">
+			<Sidebar />
+			<div data-content class="flex min-w-0 flex-1 flex-col">
+				<main id="main" class:list={['mx-auto w-full flex-1 px-5 py-12', columnWidth]}>
+					<slot />
+				</main>
+				<Footer columnWidth={columnWidth} />
+			</div>
+		</div>
+	</body>
+</html>

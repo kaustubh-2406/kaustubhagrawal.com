@@ -1,0 +1,36 @@
+---
+import { profile } from '../data/profile';
+import SocialLinks from './SocialLinks.astro';
+
+interface Props {
+	columnWidth: string;
+}
+
+const { columnWidth } = Astro.props;
+
+const madeWith = [
+	{ label: 'Astro', href: 'https://astro.build' },
+	{ label: 'Tokyo Night', href: 'https://github.com/tokyo-night/tokyo-night-vscode-theme' },
+	{ label: 'iA Writer fonts', href: 'https://github.com/iaolo/iA-Fonts' },
+	{ label: 'Caveat', href: 'https://fonts.google.com/specimen/Caveat' },
+];
+---
+
+<footer data-chrome class="mt-12 border-t border-border py-6">
+	<div class:list={['mx-auto flex flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5', columnWidth]}>
+		<div class="font-mono text-meta text-faint">
+			<p>Built with love by {profile.firstName}</p>
+			<p class="mt-1">
+				{madeWith.map(({ label, href }, i) => (
+					<>
+						{i > 0 && ' · '}
+						<a href={href} class="transition-colors duration-(--duration-fast) hover:text-accent">
+							{label}
+						</a>
+					</>
+				))}
+			</p>
+		</div>
+		<SocialLinks />
+	</div>
+</footer>

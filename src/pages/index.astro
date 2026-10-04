@@ -1,11 +1,163 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import Card from '../components/Card.astro';
+import Fact from '../components/Fact.astro';
+import GlanceCard from '../components/GlanceCard.astro';
+import LinkButton from '../components/LinkButton.astro';
+import Pill from '../components/Pill.astro';
+import Prose from '../components/Prose.astro';
+import {
+	careerStart,
+	companySites,
+	currentRole,
+	education,
+	employers,
+	formatMonth,
+	formatRange,
+	yearsSince,
+} from '../data/career';
+import { getCurrentProject } from '../data/projects';
+import { profile, resumePdf, social } from '../data/profile';
+import { techLogos } from '../data/tech';
+import BaseLayout from '../layouts/BaseLayout.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const project = await getCurrentProject();
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout>
+	<!-- ── Intro + at a glance ── -->
+	<div class="flex flex-col gap-8 lg:flex-row lg:items-start">
+		<div class="flex-1">
+			<h1 class="text-h1 font-bold text-heading">Hey, I'm {profile.firstName}!</h1>
+			<p class="mt-3 text-lg text-muted">
+				Software developer. Watches people build compilers, starts one, hasn't finished.
+				<span class="doodle-note ml-2.5 text-warm">Yet.</span>
+			</p>
+			<p class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2.5">
+				<LinkButton href={resumePdf} data-astro-reload>
+					Resume →
+				</LinkButton>
+				<a
+					href="/about"
+					class="font-mono text-meta text-muted transition-colors duration-(--duration-fast) hover:text-accent"
+				>
+					More about me →
+				</a>
+			</p>
+		</div>
+
+		<GlanceCard label="at a glance" class="lg:w-68 lg:shrink-0">
+			<Fact label="role">
+				{currentRole.title} · <span class="text-heading">{currentRole.company}</span>{' '}
+				{currentRole.location && <span class="text-muted">({currentRole.location.toLowerCase()})</span>}
+			</Fact>
+			<Fact label="experience">
+				{yearsSince(careerStart)}+ yrs <span class="text-muted">since {formatMonth(careerStart)}</span>
+			</Fact>
+			<Fact label="based in">{profile.location}</Fact>
+			<Fact label="education">
+				B.Tech CSE <span class="text-muted">· {education.year}</span>
+				<a href={education.site} class="block text-muted hover:text-accent">
+					{education.institute} ↗
+				</a>
+			</Fact>
+			<Fact label="stack" class="flex flex-wrap gap-x-3 gap-y-1 font-mono text-xs lg:flex-col">
+				{profile.stack.map((tech) => (
+					<span class="flex items-center gap-2">
+						<svg viewBox="0 0 24 24" class="size-3.5 shrink-0 fill-current text-accent" aria-hidden="true">
+							<path d={techLogos[tech].path} />
+						</svg>
+						{tech}
+					</span>
+				))}
+			</Fact>
+		</GlanceCard>
+	</div>
+
+	<!-- ── Career ── -->
+	<h2 id="career" class="doodle mt-12 mb-4">
+		<a href="#career">career</a>
+	</h2>
+	<ul class="flex flex-col gap-7">
+		{employers.map((employer) => (
+			<li>
+				<p class="font-bold text-heading">
+					<a href={companySites[employer.company]} class="hover:text-accent">
+						{employer.company}
+					</a>
+					{employer.location && <span class="font-normal text-muted"> ({employer.location.toLowerCase()})</span>}
+				</p>
+				<ol class="mt-2 flex flex-col gap-4 border-l border-border">
+					{employer.roles.map((role, i) => (
+						<li class="relative pl-5">
+							<span
+								class:list={[
+									'absolute top-2 -left-1 size-2 rounded-full',
+									i === 0 ? 'bg-accent' : 'border border-faint bg-bg',
+								]}
+								aria-hidden="true"
+							/>
+							<p class="flex items-baseline justify-between gap-4">
+								<span class="text-heading">{role.title}</span>
+								<time datetime={role.start.toISOString().slice(0, 7)} class="shrink-0 font-mono text-meta text-faint">
+									{formatRange(role)}
+								</time>
+							</p>
+							<ul class="bullets mt-1 text-sm">
+								{role.highlights.map((highlight) => (
+									<li>{highlight}</li>
+								))}
+							</ul>
+						</li>
+					))}
+				</ol>
+			</li>
+		))}
+	</ul>
+
+	<!-- ── Projects ── -->
+	{project && (
+		<>
+			<h2 id="projects" class="doodle mt-10 mb-4">
+				<a href="#projects">projects</a>
+			</h2>
+			<a href={`/projects/${project.id}`} class="block">
+				<Card class="flex flex-col gap-4 p-4 sm:flex-row sm:items-start">
+					{project.data.cover && (
+						<Image
+							src={project.data.cover}
+							alt=""
+							class="aspect-video rounded-md border border-border object-cover sm:w-56 sm:shrink-0"
+							widths={[448, 640]}
+							sizes="(min-width: 640px) 14rem, 100vw"
+						/>
+					)}
+					<div class="flex-1">
+						<p class="flex items-center gap-3">
+							<span class="font-bold text-heading">{project.data.name}</span>
+							<Pill accent class="ml-auto">
+								{project.data.status}
+							</Pill>
+						</p>
+						<p class="mt-1 text-sm text-muted">
+							{project.data.oneLiner}{' '}
+							{project.data.learning &&
+								(project.data.status === 'building'
+									? `Learning ${project.data.learning}.`
+									: `${project.data.learning}.`)}
+						</p>
+						<p class="mt-2 font-mono text-xs text-faint">{project.data.stack.join(' · ')}</p>
+					</div>
+				</Card>
+			</a>
+		</>
+	)}
+
+	<!-- ── Reach out ── -->
+	<Prose class="mt-10">
+		<p>
+			<strong class="text-heading">Want to talk?</strong> Email me at <a href={social.email.href}>{profile.email}</a>,
+			or find me on <a href={social.linkedin.href}>LinkedIn</a>.
+		</p>
+	</Prose>
+</BaseLayout>

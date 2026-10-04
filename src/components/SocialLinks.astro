@@ -1,0 +1,23 @@
+---
+import { socials } from '../data/profile';
+
+interface Props {
+	class?: string;
+	iconClass?: string;
+}
+
+const { class: className, iconClass = 'size-4' } = Astro.props;
+---
+
+<div class:list={['flex gap-4', className]}>
+	{socials.map((social) => (
+		<a
+			href={social.href}
+			aria-label={social.label}
+			title={social.label}
+			class="text-muted transition-colors duration-(--duration-fast) hover:text-accent"
+		>
+			<social.icon class={iconClass} />
+		</a>
+	))}
+</div>

@@ -1,0 +1,14 @@
+---
+// One row of a GlanceCard: a bare <dt>/<dd> pair, so it only works inside GlanceCard's <dl>.
+interface Props {
+	label: string;
+	class?: string;
+}
+
+const { label, class: className } = Astro.props;
+---
+
+<dt class="font-mono text-xs text-faint">{label}</dt>
+<dd class={className}>
+	<slot />
+</dd>

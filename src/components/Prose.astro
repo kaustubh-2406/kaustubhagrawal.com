@@ -1,0 +1,21 @@
+---
+// Styles rendered Markdown, instead of the Tailwind Typography plugin.
+interface Props {
+	class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<div
+	class:list={[
+		'[&_h2:first-child]:mt-0 [&_h2]:mt-10 [&_h2]:mb-2 [&_h2]:doodle',
+		'[&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:font-bold [&_h3]:text-heading',
+		'[&_p]:text-muted [&_p+p]:mt-3',
+		'[&_ul]:mt-2 [&_ul]:bullets',
+		'[&_a]:text-heading [&_a]:underline [&_a]:decoration-underline [&_a]:underline-offset-2 [&_a:hover]:text-accent',
+		className,
+	]}
+>
+	<slot />
+</div>
