@@ -1,0 +1,74 @@
+---
+import { Image } from 'astro:assets';
+import { render, type CollectionEntry } from 'astro:content';
+import Fact from '../../components/Fact.astro';
+import GlanceCard from '../../components/GlanceCard.astro';
+import LinkButton from '../../components/LinkButton.astro';
+import Pill from '../../components/Pill.astro';
+import Prose from '../../components/Prose.astro';
+import { formatMonth } from '../../data/career';
+import { getProjects } from '../../data/projects';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+	const projects = await getProjects();
+	return projects.map((project) => ({
+		params: { slug: project.id },
+		props: { project },
+	}));
+}
+
+interface Props {
+	project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<BaseLayout title={project.data.name} description={project.data.oneLiner} wide>
+	{project.data.cover && (
+		<Image
+			src={project.data.cover}
+			alt=""
+			class="aspect-video w-full rounded-lg border border-border object-cover"
+			widths={[640, 1200]}
+			sizes="100vw"
+		/>
+	)}
+	<h1 class="mt-6 text-h1 font-bold text-heading" transition:name={`project-title-${project.id}`}>
+		{project.data.name}
+	</h1>
+	<p class="mt-2 text-muted">{project.data.oneLiner}</p>
+
+	<div class="mt-8 flex flex-col gap-10 lg:flex-row lg:items-start">
+		<Prose class="max-w-3xl flex-1">
+			<Content />
+		</Prose>
+
+		<GlanceCard label="at a glance" class="-order-1 w-full shrink-0 lg:sticky lg:top-6 lg:order-none lg:w-64">
+			<Fact label="status">
+				<Pill accent>{project.data.status}</Pill>
+			</Fact>
+			{project.data.type && <Fact label="type">{project.data.type}</Fact>}
+			<Fact label="started">{formatMonth(project.data.started)}</Fact>
+			<Fact label="stack" class="flex flex-wrap gap-1.5">
+				{project.data.stack.map((t) => (
+					<Pill>{t}</Pill>
+				))}
+			</Fact>
+			<div slot="actions" class="mt-4 flex flex-col gap-2">
+				{project.data.repo && <LinkButton href={project.data.repo}>Repo ↗</LinkButton>}
+				{project.data.live && <LinkButton href={project.data.live}>Live ↗</LinkButton>}
+			</div>
+		</GlanceCard>
+	</div>
+
+	{project.data.gallery.length > 0 && (
+		<div class="mt-10 grid gap-4 sm:grid-cols-2">
+			{project.data.gallery.map((img) => (
+				<Image src={img.src} alt={img.alt} class="rounded-lg border border-border" />
+			))}
+		</div>
+	)}
+</BaseLayout>

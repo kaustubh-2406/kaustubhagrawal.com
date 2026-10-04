@@ -1,0 +1,16 @@
+---
+import LinkButton from '../components/LinkButton.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Not found" description="This page doesn't exist.">
+	<div class="flex flex-col items-center py-8 text-center">
+		<h1 class="text-h1 font-bold text-heading">This file isn't in the tree.</h1>
+		<p class="mt-3 text-muted">Whatever you're looking for doesn't exist here — wrong path, or it moved.</p>
+		<p class="mt-6 flex flex-wrap justify-center gap-2.5">
+			<LinkButton href="/">Home →</LinkButton>
+			<LinkButton href="/projects">Projects →</LinkButton>
+			<LinkButton href="/about">About →</LinkButton>
+		</p>
+	</div>
+</BaseLayout>
