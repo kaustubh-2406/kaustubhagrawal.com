@@ -6,7 +6,6 @@ import User from '@lucide/astro/icons/user';
 import FileText from '@lucide/astro/icons/file-text';
 import Github from '../components/icons/Github.astro';
 import Linkedin from '../components/icons/Linkedin.astro';
-import { yearMonth } from './career';
 import type { Tech } from './tech';
 
 export const profile = {
@@ -41,6 +40,34 @@ export const nav = [
 ];
 
 // ── About page ──────────────────────────────────────────
+// "How it started": `type` is the faint commit prefix, `line` always shows, `rest` opens on tap.
+export const howItStarted = [
+	{
+		when: '2017',
+		type: 'init',
+		line: 'It started with C++ in 11th grade.',
+		rest: 'What hooked me wasn’t the syntax but what sat under it: an int taking 4 bytes, an array laid out as one block of memory, pointers walking through it. The dreaded pointer clicked fast, thanks to a teacher who felt more like a friend. We’d find them after class, at lunch, in free periods.',
+	},
+	{
+		when: '2020',
+		type: 'chore',
+		line: 'My real classroom was YouTube.',
+		rest: 'COVID hit and I suddenly had a lot of free time. Traversy Media came first, then Tsoding, ThePrimeagen and a few others, and slowly the dots started connecting. Those channels did a lot to get me where I am.',
+	},
+	{
+		when: 'college',
+		type: 'feat',
+		line: 'My first database was a CSV file.',
+		rest: 'Our Java teacher threw out a challenge, not graded: build your own database. Mine was a tiny command-line tool that read and wrote a CSV file. No concurrency, honestly not much at all. It hooked me anyway, and databases have fascinated me ever since.',
+	},
+	{
+		when: '2022',
+		type: 'feat',
+		line: 'At work, I ship.',
+		rest: 'An internship at AlphaBI in 2022, a full-time role there, now Axy. My favourite kind of work is being handed something unfamiliar and figuring it out.',
+	},
+];
+
 export const learningFrom = [
 	{
 		label: 'taught me',
@@ -60,9 +87,3 @@ export const learningFrom = [
 		],
 	},
 ];
-
-/** Dated by hand: bump `updated` whenever the list changes. */
-export const now = {
-	updated: yearMonth('2026-10'),
-	items: ["Following boot.dev's course to build basic-ai-agent, a small coding agent", 'Building this website'],
-};

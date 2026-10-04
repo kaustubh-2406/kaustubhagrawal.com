@@ -1,0 +1,126 @@
+---
+import Prose from '../components/Prose.astro';
+import LinkButton from '../components/LinkButton.astro';
+import { careerStart, currentRole, formatMonth, yearMonth, yearsSince } from '../data/career';
+import { howItStarted, learningFrom, profile, resumePdf, social } from '../data/profile';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const nowUpdated = yearMonth('2026-10'); // bump whenever the "now" list changes
+---
+
+<BaseLayout title="About" description={`About ${profile.name}, ${profile.tagline}`}>
+	<!-- ── Intro ── -->
+	<h1 class="text-h1 font-bold text-heading">About me</h1>
+	<p class="mt-3 text-muted">
+		Building software professionally for {yearsSince(careerStart)}+ years, from {profile.location}. These days I work
+		remotely at {currentRole.company}.
+	</p>
+	<p class="mt-5">
+		<LinkButton href={resumePdf} data-astro-reload>
+			Resume →
+		</LinkButton>
+	</p>
+
+	<!-- ── How it started ── -->
+	<h2 id="how-it-started" class="doodle mt-12 mb-4">
+		<a href="#how-it-started">how it started</a>
+	</h2>
+	<p class="mb-5 font-mono text-meta text-faint" aria-hidden="true">
+		$ git log --reverse
+	</p>
+	<ol class="flex flex-col gap-5 border-l border-border">
+		{howItStarted.map(({ when, type, line, rest }, i) => (
+			<li class="relative pl-5">
+				<span class="absolute top-1.5 -left-1.25 size-2.25 rounded-full bg-accent" aria-hidden="true" />
+				<details class="group">
+					<summary class="flex cursor-pointer list-none flex-wrap items-baseline gap-x-3 font-mono text-sm [&::-webkit-details-marker]:hidden">
+						<span class="w-16 shrink-0 text-warm">{when}</span>
+						<span class="text-faint" aria-hidden="true">
+							{type}:
+						</span>
+						<span class="text-heading hover:text-accent">{line}</span>
+						{i === howItStarted.length - 1 && (
+							<span class="text-meta text-faint" aria-hidden="true">
+								(HEAD)
+							</span>
+						)}
+					</summary>
+					<p class="mt-1 text-sm text-muted sm:pl-19">{rest}</p>
+				</details>
+			</li>
+		))}
+	</ol>
+
+	<!-- ── What I'm doing now ── -->
+	<h2 id="now" class="doodle mt-10 mb-1">
+		<a href="#now">what I'm doing now</a>
+	</h2>
+	<p class="font-mono text-meta text-faint">Updated {formatMonth(nowUpdated)}</p>
+	<Prose class="mt-1 text-sm">
+		<ul>
+			<li>
+				Following boot.dev's{' '}
+				<a href="https://www.boot.dev/courses/build-ai-agent-python">Build an AI Agent in Python</a> course to build{' '}
+				<a href="/projects/basic-ai-agent">basic-ai-agent</a>, a small coding agent
+			</li>
+			<li>Building this website</li>
+		</ul>
+	</Prose>
+
+	<!-- ── Learning from ── -->
+	<h2 id="learning-from" class="doodle mt-10 mb-3">
+		<a href="#learning-from">learning from</a>
+	</h2>
+	<div class="flex flex-col gap-4">
+		{learningFrom.map(({ label, people }) => (
+			<div>
+				<p class="font-mono text-meta text-faint">{label}</p>
+				<ul class="bullets mt-1.5 text-sm">
+					{people.map(({ name, note }) => (
+						<li>
+							<span class="text-heading">{name}</span>: {note}
+						</li>
+					))}
+				</ul>
+			</div>
+		))}
+	</div>
+
+	<!-- ── Off the clock ── -->
+	<h2 id="off-the-clock" class="doodle mt-10 mb-1">
+		<a href="#off-the-clock">off the clock</a>
+	</h2>
+	<Prose class="text-sm">
+		<ul>
+			<li>Tried learning the flute. Didn't get very far.</li>
+			<li>Starting Advent of Code every December since 2022 (Rust, C, Go). Finishing one is on the list.</li>
+			<li>
+				Running a mostly stock <a href="https://omarchy.org">Omarchy</a> setup.{' '}
+				<span class="doodle-note">← yes, I use Arch, btw</span>
+			</li>
+		</ul>
+	</Prose>
+
+	<!-- ── Contact ── -->
+	<h2 id="contact" class="doodle mt-10 mb-3">
+		<a href="#contact">contact</a>
+	</h2>
+	<ul class="flex flex-col gap-1.5 text-sm text-muted">
+		<li>
+			Email:{' '}
+			<a href={social.email.href} class="text-heading hover:text-accent">
+				{profile.email}
+			</a>
+		</li>
+		<li class="flex gap-2">
+			{[social.github, social.linkedin].map((link, i, links) => (
+				<>
+					<a href={link.href} class="text-heading hover:text-accent">
+						{link.label}
+					</a>
+					{i < links.length - 1 && <span class="text-faint">·</span>}
+				</>
+			))}
+		</li>
+	</ul>
+</BaseLayout>
