@@ -46,7 +46,7 @@ export const howItStarted = [
 		when: '2017',
 		type: 'init',
 		line: 'It started with C++ in 11th grade.',
-		rest: 'What hooked me wasn’t the syntax but what sat under it: an int taking 4 bytes, an array laid out as one block of memory, pointers walking through it. The dreaded pointer clicked fast, thanks to a teacher who felt more like a friend. We’d find them after class, at lunch, in free periods.',
+		rest: 'What hooked me wasn’t the syntax but what sat under it. The first time I pictured an array as a row of blocks in memory, with a pointer jumping a whole block at a time depending on what it pointed to, it gave me a kick I still can’t really explain.',
 	},
 	{
 		when: '2020',
