@@ -22,15 +22,30 @@ import { techLogos } from '../data/tech';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const project = await getCurrentProject();
+
+// Tells search engines which Kaustubh Agrawal this is: the profiles and employer tie him to one person.
+const person = {
+	'@context': 'https://schema.org',
+	'@type': 'Person',
+	name: profile.name,
+	url: Astro.site,
+	jobTitle: currentRole.title,
+	worksFor: { '@type': 'Organization', name: currentRole.company, url: companySites[currentRole.company] },
+	alumniOf: { '@type': 'CollegeOrUniversity', name: education.institute, url: education.site },
+	homeLocation: { '@type': 'Place', name: profile.location },
+	knowsAbout: profile.stack,
+	sameAs: [social.github.href, social.linkedin.href],
+};
 ---
 
 <BaseLayout>
+	<script type="application/ld+json" slot="head" set:html={JSON.stringify(person)} />
 	<!-- ── Intro + at a glance ── -->
 	<div class="flex flex-col gap-8 lg:flex-row lg:items-start">
 		<div class="flex-1">
 			<h1 class="text-h1 font-bold text-heading">Hey, I'm {profile.firstName}!</h1>
 			<p class="mt-3 text-lg text-muted">
-				Software developer. Watches people build compilers, starts one, hasn't finished.
+				Software developer. Watches people build things from scratch, starts one, hasn't finished.
 				<span class="doodle-note ml-2.5 text-warm">Yet.</span>
 			</p>
 			<p class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2.5">

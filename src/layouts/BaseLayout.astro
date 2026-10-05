@@ -3,6 +3,7 @@ import { Font } from 'astro:assets';
 import { ClientRouter, fade } from 'astro:transitions';
 import Footer from '../components/Footer.astro';
 import Sidebar from '../components/Sidebar.astro';
+import { currentRole } from '../data/career';
 import { profile } from '../data/profile';
 import '../styles/global.css';
 
@@ -19,6 +20,9 @@ const {
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
+// Home leads with the name and role, so searches for the name can tell this Kaustubh Agrawal apart.
+const fullTitle = title ? `${title} – ${profile.name}` : `${profile.name} – ${currentRole.title}`;
+const ogImage = new URL('/og.png', Astro.site);
 const columnWidth = wide ? 'max-w-4xl' : 'max-w-3xl'; // main and footer share it
 ---
 
@@ -28,11 +32,26 @@ const columnWidth = wide ? 'max-w-4xl' : 'max-w-3xl'; // main and footer share i
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="color-scheme" content="dark" />
-		<title>{title ? `${title} – ${profile.name}` : profile.name}</title>
+		<title>{fullTitle}</title>
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonical} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+
+		<!-- Link previews (LinkedIn, X, WhatsApp): one static card for every page. -->
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content={profile.name} />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content={`${profile.name}, ${currentRole.title}`} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<slot name="head" />
 
 		<Font cssVariable="--font-quattro" preload />
 		<Font cssVariable="--font-ia-mono" />
