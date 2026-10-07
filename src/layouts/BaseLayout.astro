@@ -19,7 +19,8 @@ const {
 	wide = false,
 } = Astro.props;
 
-const canonical = new URL(Astro.url.pathname, Astro.site);
+// Builds are `about.html` (astro.config.mjs); the public URL is `/about`.
+const canonical = new URL(Astro.url.pathname.replace(/(index)?\.html$/, ''), Astro.site);
 // Home leads with the name and role, so searches for the name can tell this Kaustubh Agrawal apart.
 const fullTitle = title ? `${title} – ${profile.name}` : `${profile.name} – ${currentRole.title}`;
 const ogImage = new URL('/og.png', Astro.site);

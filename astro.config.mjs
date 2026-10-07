@@ -7,6 +7,9 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://kaustubhagrawal.com',
+	// `about.html`, not `about/index.html`: Cloudflare Pages serves it at `/about` directly, so links skip a 307 to `/about/`.
+	build: { format: 'file' },
+	trailingSlash: 'never',
 
 	redirects: { '/resume': '/kaustubh-agrawal-resume.pdf', '/cv': '/kaustubh-agrawal-resume.pdf' },
 
